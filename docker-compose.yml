@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  app:
+    build: .                              # Сборка приложения
+    ports:
+      - "5000:5000"                       # Порт для Flask
+    environment:                          # Переменные окружения для подключения к БД
+      DB_HOST: db
+      DB_USER: user
+      DB_PASSWORD: password
+      DB_NAME: mail_database
+    depends_on:
+      - db                                # Зависимость от MySQL
+
+  db:
+    image: mysql:8.0                      # Образ MySQL
+    restart: always                       # Перезапуск контейнера при сбое
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword   # Пароль для root
+      MYSQL_DATABASE: mail_database       # Имя базы данных
+      MYSQL_USER: user                    # Пользователь
+      MYSQL_PASSWORD: password            # Пароль пользователя
+    ports:
+      - "3308:3306"                       # Порт для MySQL
+    volumes:
+      - db_data:/var/lib/mysql            # Volume для хранения данных
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql # Скрипт для инициализации
+
+volumes:
+  db_data:                                # Объявление volume для базы данных
+
